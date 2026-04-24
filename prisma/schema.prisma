@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id         String      @id @default(cuid())
+  username   String      @unique
+  password   String
+  role       Role        @default(USER)
+  favourites Favourite[]
+  createdAt  DateTime    @default(now())
+}
+
+model Favourite {
+  id        String   @id @default(cuid())
+  name      String
+  country   String
+  lat       Float
+  lon       Float
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
