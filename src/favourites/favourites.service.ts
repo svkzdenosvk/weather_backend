@@ -12,7 +12,10 @@ export class FavouritesService {
     });
   }
 
-  async add(userId: string, city: { name: string; country: string; lat: number; lon: number }) {
+  async add(
+    userId: string,
+    city: { name: string; country: string; lat: number; lon: number },
+  ) {
     return this.prisma.favourite.create({
       data: { ...city, userId },
     });
