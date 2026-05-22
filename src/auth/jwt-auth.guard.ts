@@ -20,7 +20,9 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload = verifyShortToken(token);
       if (!payload) throw new UnauthorizedException();
-      request.user = payload;
+      // request.user = payload;
+      request.user = { sub: payload.id, username: payload.username };
+
       return true;
     } catch {
       throw new UnauthorizedException();
