@@ -10,10 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      'https://angular-trainee-2024.netlify.app',
-    ],
+    origin: ['http://localhost:4200', 'https://weather-angular21.netlify.app'],
     methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
