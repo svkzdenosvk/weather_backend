@@ -1,5 +1,3 @@
-
-
 import {
   Controller,
   Post,
@@ -8,7 +6,6 @@ import {
   Res,
   Req,
   HttpCode,
-  
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -43,9 +40,13 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateUser(dto.username, dto.password);
+    const user = await this.authService.validateUser(
+      dto.username,
+      dto.password,
+    );
 
-    const shortToken = signShortToken(user.id, user.username);
+    // const shortToken = signShortToken(user.id, user.username);
+    const shortToken = signShortToken(user.id, user.username, user.role);
     const longToken = signLongToken(user.id);
 
     res.cookie('shortTerm_token', shortToken, {
@@ -71,16 +72,19 @@ export class AuthController {
   @Get('logout')
   @HttpCode(200)
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('shortTerm_token', { ...cookieOptions, expires: new Date(0) });
-    res.clearCookie('longTerm_token', { ...cookieOptions, expires: new Date(0) });
+    res.clearCookie('shortTerm_token', {
+      ...cookieOptions,
+      expires: new Date(0),
+    });
+    res.clearCookie('longTerm_token', {
+      ...cookieOptions,
+      expires: new Date(0),
+    });
     return { success: true };
   }
 
   @Get('me')
-  async me(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async me(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       const shortToken = String(req.cookies?.shortTerm_token ?? '');
       const longToken = String(req.cookies?.longTerm_token ?? '');
@@ -110,15 +114,14 @@ export class AuthController {
 
       if (!user) return { isLoggedIn: false };
 
-      // 3. Refreshni short token
-      const newShortToken = signShortToken(user.id, user.username);
+      // 3. Refresh short token
+      const newShortToken = signShortToken(user.id, user.username, user.role);
       res.cookie('shortTerm_token', newShortToken, {
         ...cookieOptions,
         maxAge: 15 * 60 * 1000,
       });
 
       return { isLoggedIn: true, user };
-
     } catch {
       return { isLoggedIn: false };
     }
