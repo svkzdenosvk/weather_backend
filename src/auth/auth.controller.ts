@@ -6,6 +6,7 @@ import {
   Res,
   Req,
   HttpCode,
+  Param,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -125,5 +126,12 @@ export class AuthController {
     } catch {
       return { isLoggedIn: false };
     }
+  }
+
+  // auth.controller.ts
+  @Get('check-username/:username')
+  async checkUsername(@Param('username') username: string) {
+    const exists = await this.authService.usernameExists(username);
+    return { available: !exists };
   }
 }
