@@ -19,6 +19,7 @@ import {
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UserResponseDto } from 'src/common/dto-response/user-response.dto';
 
 @ApiTags('users')
 @ApiCookieAuth('shortTerm_token')
@@ -30,7 +31,7 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get profile of the currently authenticated user' })
-  @ApiResponse({ status: 200, description: 'Current user profile' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getMe(@Request() req: any) {
     return this.usersService.findById(req.user.sub);
@@ -39,7 +40,7 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({ status: 200, description: 'User found' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
   findById(@Param('id') id: string) {
     return this.usersService.findById(id);
@@ -49,7 +50,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Update profile of the currently authenticated user',
   })
-  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   updateMe(@Request() req: any, @Body() dto: UpdateUserDto) {
     return this.usersService.update(req.user.sub, dto);
@@ -58,7 +59,7 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by ID — admin or own profile only' })
   @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({
     status: 403,

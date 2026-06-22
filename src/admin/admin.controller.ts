@@ -19,6 +19,8 @@ import {
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from './admin.guard';
+import { UserResponseDto } from 'src/common/dto-response/user-response.dto';
+import { SuccessResponseDto } from 'src/common/dto-response/success-response.dto';
 
 @ApiTags('admin')
 @ApiCookieAuth('shortTerm_token')
@@ -30,7 +32,7 @@ export class AdminController {
 
   @Get('users')
   @ApiOperation({ summary: 'Get all users — admin only' })
-  @ApiResponse({ status: 200, description: 'List of all users' })
+  @ApiResponse({ status: 200, type: [UserResponseDto] })
   @ApiResponse({ status: 403, description: 'Forbidden — admin role required' })
   getAllUsers() {
     return this.adminService.getAllUsers();
@@ -39,7 +41,7 @@ export class AdminController {
   @Delete('users/:id')
   @ApiOperation({ summary: 'Delete user by ID — admin only' })
   @ApiParam({ name: 'id', description: 'User ID to delete' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 200, type: SuccessResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden — admin role required' })
   @ApiResponse({ status: 404, description: 'User not found' })
   deleteUser(@Param('id') id: string) {
@@ -50,7 +52,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Update user role — admin only' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiBody({ schema: { example: { role: 'ADMIN' } } })
-  @ApiResponse({ status: 200, description: 'Role updated successfully' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden — admin role required' })
   updateRole(
     @Param('id') id: string,

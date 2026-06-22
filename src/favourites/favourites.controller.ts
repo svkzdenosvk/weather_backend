@@ -18,6 +18,8 @@ import {
 
 import { FavouritesService } from './favourites.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FavouriteResponseDto } from 'src/common/dto-response/favourite-response.dto';
+import { SuccessResponseDto } from 'src/common/dto-response/success-response.dto';
 
 export class AddFavouriteDto {
   name: string;
@@ -36,7 +38,7 @@ export class FavouritesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all favourites for the authenticated user' })
-  @ApiResponse({ status: 200, description: 'List of favourite locations' })
+  @ApiResponse({ status: 200, type: [FavouriteResponseDto] })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getAll(@Request() req: any) {
     return this.favouritesService.getAll(req.user.sub);
@@ -44,7 +46,7 @@ export class FavouritesController {
 
   @Post()
   @ApiOperation({ summary: 'Add a new favourite location' })
-  @ApiResponse({ status: 201, description: 'Location added to favourites' })
+  @ApiResponse({ status: 201, type: FavouriteResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   add(@Request() req: any, @Body() body: AddFavouriteDto) {
     return this.favouritesService.add(req.user.sub, body);
@@ -53,7 +55,7 @@ export class FavouritesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Remove a favourite location by ID' })
   @ApiParam({ name: 'id', description: 'Favourite location ID' })
-  @ApiResponse({ status: 200, description: 'Location removed from favourites' })
+  @ApiResponse({ status: 200, type: SuccessResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Favourite not found' })
   remove(@Request() req: any, @Param('id') id: string) {

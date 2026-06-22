@@ -26,6 +26,11 @@ import {
   verifyShortToken,
   verifyLongToken,
 } from '../lib/jwt/jwt_helper';
+import { LoginResponseDto } from './dto/dto-response/login-response.dto';
+import { UserResponseDto } from 'src/common/dto-response/user-response.dto';
+import { SuccessResponseDto } from 'src/common/dto-response/success-response.dto';
+import { MeResponseDto } from './dto/dto-response/me-response.dto';
+import { UsernameCheckResponseDto } from './dto/dto-response/username-check-response.dto';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -47,14 +52,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user and set auth cookies' })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Login successful — sets shortTerm_token and longTerm_token cookies',
-    schema: {
-      example: { user: { id: 1, username: 'john_doe', role: 'USER' } },
-    },
-  })
+  @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(
     @Body() dto: LoginDto,
@@ -86,7 +84,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User registered successfully' })
+  @ApiResponse({ status: 201, type: UserResponseDto })
   @ApiResponse({ status: 409, description: 'Username already taken' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto.username, dto.password);
@@ -96,11 +94,7 @@ export class AuthController {
   @HttpCode(200)
   @ApiCookieAuth('shortTerm_token')
   @ApiOperation({ summary: 'Logout user and clear auth cookies' })
-  @ApiResponse({
-    status: 200,
-    description: 'Logout successful',
-    schema: { example: { success: true } },
-  })
+  @ApiResponse({ status: 200, type: SuccessResponseDto })
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('shortTerm_token', {
       ...cookieOptions,
@@ -119,16 +113,7 @@ export class AuthController {
     summary:
       'Get currently authenticated user (auto-refreshes short token if expired)',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns user info or isLoggedIn: false',
-    schema: {
-      example: {
-        isLoggedIn: true,
-        user: { id: 1, username: 'john_doe', role: 'USER' },
-      },
-    },
-  })
+  @ApiResponse({ status: 200, type: MeResponseDto })
   async me(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       const shortToken = String(req.cookies?.shortTerm_token ?? '');
@@ -180,11 +165,7 @@ export class AuthController {
     description: 'Username to check',
     example: 'john_doe',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Availability status',
-    schema: { example: { available: true } },
-  })
+  @ApiResponse({ status: 200, type: UsernameCheckResponseDto })
   async checkUsername(@Param('username') username: string) {
     const exists = await this.authService.usernameExists(username);
     return { available: !exists };
