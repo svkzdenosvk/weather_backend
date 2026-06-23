@@ -2,9 +2,9 @@ name: NestJS CI
 
 on:
   push:
-    branches: [main, refr_token]
+    branches: [swagger-schemas, refr_token]
   pull_request:
-    branches: [main, refr_token]
+    branches: [swagger-schemas, refr_token]
 
 jobs:
   test:
